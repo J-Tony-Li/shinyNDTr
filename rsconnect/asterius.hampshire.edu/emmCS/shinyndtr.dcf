@@ -1,0 +1,12 @@
+name: shinyndtr
+title: ShinyNDTr
+username: emmCS
+account: emmCS
+server: asterius.hampshire.edu
+hostUrl: https://asterius.hampshire.edu:3939/__api__
+appId: 13
+bundleId: 13
+url: https://asterius.hampshire.edu:3939/content/13/
+when: 1561483869.84472
+asMultiple: FALSE
+asStatic: FALSE

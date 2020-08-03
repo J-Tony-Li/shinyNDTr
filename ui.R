@@ -189,7 +189,7 @@ ui <- dashboardPage(
                                                box(
                                                  width = NULL,
                                                  title = "Additional parameters (if applicable)",
-                                                 conditionalPanel(condition  = "input.CL == 'svm_CL'",
+                                                 conditionalPanel(condition  = "input.CL == 'cl_svm'",
                                                                   selectInput("CL_SVM_kernel",
                                                                               lLabels$CL_SVM_kernel,
                                                                               c("linear", "polynomial", "radial", "sigmoid"),

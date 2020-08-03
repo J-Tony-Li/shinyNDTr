@@ -952,13 +952,13 @@ req(rv$mRaster_cur_data)
 
     if(input$DS_type == "basic_DS"){
 
-      NDTr::calc_num_level_repetitions(rv$binned_data, input$DS_basic_var_to_decode, reactive_DS_levels_to_use())
+      num_label_reps <- NDTr::get_num_label_repetitions(rv$binned_data, input$DS_basic_var_to_decode, reactive_DS_levels_to_use())
 
 
 
     } else{
 
-      NDTr::calc_num_level_repetitions(rv$binned_data, input$DS_gen_var_to_use, reactive_DS_levels_to_use())
+      NDTr::get_num_label_repetitions(rv$binned_data, input$DS_gen_var_to_use, reactive_DS_levels_to_use())
 
     }
   })

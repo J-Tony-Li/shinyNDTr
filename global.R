@@ -37,8 +37,13 @@ www_base_dir <- file.path(eval(getwd()),'www') #"."
 
 # df_cl_fp <- data.frame(c(1, 1, 1), c(1, 1, 1), c(1, 1, 0))
 
-all_cl <- c("max_correlation_CL", "svm_CL", "poisson_naive_bayes_CL")
-all_fp <- c("select_k_features_FP", "zscore_FP")
+#all_cl <- c("max_correlation_CL", "svm_CL", "poisson_naive_bayes_CL")
+all_cl <- c("cl_max_correlation", "cl_svm", "cl_poisson_naive_bayes")
+
+#all_fp <- c("select_k_features_FP", "zscore_FP")
+all_fp <- c("fp_select_k_features", "fp_zscore")
+
+
 
 all_result_type <- c("zero_one_loss_results", "rank_results", "decision_value_results")
 
@@ -279,8 +284,9 @@ create_script_in_r <- function(my_decoding_params, rv) {
     my_text = paste0(my_text, "variable_to_decode <-", "'",my_decoding_params$DS_basic_var_to_decode,"'", "\n\n\n")
     my_text = paste0(my_text, "num_cv_splits <- ", my_decoding_params$CV_split, "\n\n\n")
 
-    my_text = paste0(my_text, "ds <- NDTr::basic_DS$new(binned_file_name, variable_to_decode, num_cv_splits)\n\n\n")
-    my_text = paste0(my_text, "ds$num_repeats_per_level_per_cv_split <- ", my_decoding_params$CV_repeat, "\n\n\n")
+    my_text = paste0(my_text, "ds <- NDTr::ds_basic(binned_file_name, variable_to_decode, num_cv_splits,
+                     num_label_repeats_per_cv_split = ", my_decoding_params$CV_repeat,")\n\n\n")
+
 
     # this one is bad because level_to_use can be passed from the previous selection
     # if(!is.null(my_decoding_params$DS_basic_level_to_use)){
@@ -296,7 +302,7 @@ create_script_in_r <- function(my_decoding_params, rv) {
   # my_text = paste0(my_text, "\n\n\n```{r}\n\n\n")
 
 
-  my_text = paste0(my_text, "cl <- NDTr::", my_decoding_params$CL, "$new()\n\n\n")
+  my_text = paste0(my_text, "cl <- NDTr::", my_decoding_params$CL, "()\n\n\n")
 
 
   # my_text = paste0(my_text, "```\n\n\n")
@@ -311,12 +317,12 @@ create_script_in_r <- function(my_decoding_params, rv) {
 
   if(!is.null(my_decoding_params$FP)){
     if(sum(grepl(all_fp[2], my_decoding_params$FP)) == 1){
-      norm_text = paste0(norm_text, "NDTr::", all_fp[2], "$new()")
+      norm_text = paste0(norm_text, "NDTr::", all_fp[2], "()")
       my_text = paste0(my_text, norm_text, ",")
     }
 
     if(sum(grepl(all_fp[1], my_decoding_params$FP)) == 1){
-      select_k_text = paste0(select_k_text, "NDTr::", all_fp[2], "$new(","num_sites_to_use = ", my_decoding_params$FP_selected_k, ",", "num_sites_to_exclude = ", my_decoding_params$FP_excluded_k,")" )
+      select_k_text = paste0(select_k_text, "NDTr::", all_fp[2], "(","num_sites_to_use = ", my_decoding_params$FP_selected_k, ",", "num_sites_to_exclude = ", my_decoding_params$FP_excluded_k,")" )
       my_text = paste0(my_text, select_k_text)
     } else {
       my_text = substr(my_text, 1, nchar(my_text)-1)
@@ -331,13 +337,16 @@ create_script_in_r <- function(my_decoding_params, rv) {
   # my_text = paste0(my_text, "```\n\n\n")
   # my_text = paste0(my_text, "\n\n\n```{r}\n\n\n")
 
-  my_text = paste0(my_text, "cv <- NDTr::standard_CV$new(ds, cl, fps)\n\n\n")
+  #my_text = paste0(my_text, "cv <- NDTr::cv_standard(ds, cl, fps)\n\n\n")
+  my_text = paste0(my_text, "cv <- NDTr::cv_standard(ds, cl, fps, NULL, 2)\n\n\n")
+
+
 
   # my_text = paste0(my_text, "```\n\n\n")
   # my_text = paste0(my_text, "\n\n\n```{r}\n\n\n")
 
 
-  my_text = paste0(my_text, "DECODING_RESULTS <- cv$run_decoding()\n\n\n")
+  my_text = paste0(my_text, "DECODING_RESULTS <- NDTr::run_decoding(cv)\n\n\n")
 
   my_text = paste0(my_text, "save('DECODING_RESULTS', file = '",my_decoding_params$DC_to_be_saved_result_name, "')")
 
@@ -417,7 +426,7 @@ add_ndt_paths_and_init_rand_generator"
     }
 
     if(sum(grepl(all_fp[1], my_decoding_params$FP)) == 1){
-      select_k_text = paste0(select_k_text, "NDTr::", all_fp[2], "$new(","num_sites_to_use = ", my_decoding_params$FP_selected_k, ",", "num_sites_to_exclude = ", my_decoding_params$FP_excluded_k,")" )
+      select_k_text = paste0(select_k_text, "NDTr::", all_fp[2], "(","num_sites_to_use = ", my_decoding_params$FP_selected_k, ",", "num_sites_to_exclude = ", my_decoding_params$FP_excluded_k,")" )
       my_text = paste0(my_text, select_k_text)
     } else {
       my_text = substr(my_text, 1, nchar(my_text)-1)
@@ -433,6 +442,8 @@ add_ndt_paths_and_init_rand_generator"
   # my_text = paste0(my_text, "\n\n\n```{r}\n\n\n")
 
   my_text = paste0(my_text, "cv = standard_resample_CV(ds, cl, fps);\n\n\n")
+
+
 
   # my_text = paste0(my_text, "```\n\n\n")
   # my_text = paste0(my_text, "\n\n\n```{r}\n\n\n")

@@ -78,7 +78,7 @@ input_id <- c("Plot_create_pdf","home_state_name","home_loaded_state","home_save
 input_label <- c("Create","File name of the current state should be saved (e.g., state_01.Rda)","Load a pre-existing state","Save the current state","Browse", "File name of the result to be saved (e.g., ZD_001.Rda)","File type for generated script","File name of the displayed script to be saved (e.g., ZD_01.Rmd)", "Save to disk","Save to disk","Save to disk",
   "Create raster",
                  "Bin the data", "Bin width", "Plot the data? (only for spike trains in .Rda file)", "Browse",
-                 "Index of the sample where the last bin ends (optional)", "next file","prefix of binned file name (e.g., data/binned/ZD)",
+                 "Index of the sample where the last bin ends (optional)", "next file","prefix of binned file name (e.g., ZD)",
                  "New raster directory name (e.g., data/raster/Zhang_Desimone_7objects_raster_data_rda; by default, we append '_rda' to the matlab raster directory name)",
                  "previous file", "Index of the sample where the new raster data end","Index of the sample where the new raster data begin",
                  "Index of the sample where the first bin starts (optional)", "Step size",

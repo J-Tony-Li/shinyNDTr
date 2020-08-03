@@ -116,7 +116,7 @@ observe({
     } else {
       rv$raster_bMat <-FALSE
       temp_names_of_all_rda_files_in_raster_dir <-
-        list.files(rv$raster_cur_dir_name, pattern = "\\.Rda$")
+        list.files(rv$raster_cur_dir_name, pattern = "\\.[rR]da$")
       rv$raster_num_neuron <- length(temp_names_of_all_rda_files_in_raster_dir)
 
       if(rv$raster_num_neuron > 0){
@@ -277,10 +277,15 @@ observe({
   observeEvent(input$bin_bin_data,{
 
 print(typeof(input$bin_bin_data))
+
     if(rv$raster_bRda){
+
+      # data binned data in the director data/binned
+      binned_basename <- trimws(file.path("data", "binned", " "))
+
       # print(input$bin_start_ind)
-      temp_call = paste0("NDTr::create_binned_data(rv$raster_cur_dir_name,",
-                         "input$bin_prefix_of_binned_file_name,",
+      temp_call = paste0("NDTr::create_binned_data(rv$raster_cur_dir_name, ",
+                         "paste0(binned_basename, input$bin_prefix_of_binned_file_name),",
                          "input$bin_bin_width, input$bin_step_size")
       if(!is.na(input$bin_start_ind)){
         temp_call = paste0(temp_call, ",input$bin_start_ind")
@@ -293,6 +298,7 @@ print(typeof(input$bin_bin_data))
       eval(parse(text = temp_call))
 
     } else if(rv$raster_bMat){
+
       temp_call = paste0("NDTr::create_binned_data_from_matlab_raster_data(rv$raster_cur_dir_name,",
                          "input$bin_prefix_of_binned_file_name,",
                          "input$bin_bin_width, input$bin_step_size")

@@ -954,19 +954,23 @@ req(rv$mRaster_cur_data)
 
 
   reactive_level_repetition_info <- reactive({
+
     req(reactive_DS_levels_to_use())
 
     if(input$DS_type == "basic_DS"){
 
       num_label_reps <- NDTr::get_num_label_repetitions(rv$binned_data, input$DS_basic_var_to_decode, reactive_DS_levels_to_use())
 
-
-
     } else{
 
-      NDTr::get_num_label_repetitions(rv$binned_data, input$DS_gen_var_to_use, reactive_DS_levels_to_use())
+      num_label_reps <- NDTr::get_num_label_repetitions(rv$binned_data, input$DS_gen_var_to_use, reactive_DS_levels_to_use())
 
     }
+
+    num_label_reps
+
+
+
   })
 
 
@@ -977,7 +981,11 @@ req(rv$mRaster_cur_data)
     req(reactive_level_repetition_info())
     temp_level_repetition_info <- reactive_level_repetition_info()
 
-        paste("Levels chosen for training:", "<font color='red'>", paste(reactive_DS_levels_to_use(), collapse = ', '),"<br/>", "</font>", "The maximum number of repetitions across all the levels for training as set on the Data Source tab is", "<font color='red'>",temp_level_repetition_info$max_repetition_avail_with_any_site, "</font>", ".")
+        paste("Levels chosen for training:", "<font color='red'>",
+              paste(reactive_DS_levels_to_use(), collapse = ', '),
+              "<br/>", "</font>", "The maximum number of repetitions across all the levels for training as set on the Data Source tab is",
+              "<font color='red'>",
+              min(temp_level_repetition_info$min_repeats), "</font>", ".")
   })
 
 
@@ -985,17 +993,20 @@ req(rv$mRaster_cur_data)
 
     req(reactive_level_repetition_info())
     temp_level_repetition_info <- reactive_level_repetition_info()
-    temp_level_repetition_info$plotly
+    ggplotly(plot(temp_level_repetition_info))
+
   })
 
 
 
   reactive_chosen_repetition_info <- reactive({
+
     req(input$CV_split, input$CV_repeat, reactive_level_repetition_info())
     temp_level_repetition_info <- reactive_level_repetition_info()
 
     list(num_repetition = input$CV_repeat * input$CV_split,
-       num_sites_avail = nrow(filter(temp_level_repetition_info$num_repeats_across_levels_per_site, min_repeats >= input$CV_repeat * input$CV_split)))
+       num_sites_avail = nrow(filter(temp_level_repetition_info, min_repeats >= input$CV_repeat * input$CV_split)))
+
     })
 
 

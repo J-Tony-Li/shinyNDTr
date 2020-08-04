@@ -218,13 +218,13 @@ append_result_to_pdf_and_knit <- function(result_chosen, Plot_timeseries_result_
 
 
 
-create_pdf_including_result_upon_run_decoding <- function(DC_to_be_saved_script_name){
+create_pdf_including_result_upon_run_decoding <- function(potential_rmd_name ){
 
-  my_new_file_name = file.path(www_base_dir, DC_to_be_saved_script_name)
+  message("currently not using create_pdf_including_result_upon_run_decoding() global.R function")
 
-  file.create(my_new_file_name,  overwrite = TRUE)
-
-  potential_rmd_name <- file.path(script_base_dir, DC_to_be_saved_script_name)
+  #my_new_file_name = file.path(www_base_dir, DC_to_be_saved_script_name)
+  #file.create(my_new_file_name,  overwrite = TRUE)
+  #potential_rmd_name <- file.path(script_base_dir, DC_to_be_saved_script_name)
 
   # my_text = paste(readLines(potential_rmd_name), collapse = "")
   my_text = sourcetools::read(potential_rmd_name)
@@ -275,7 +275,7 @@ create_script_in_r <- function(my_decoding_params, rv) {
 
 
 
-  my_text = paste0(my_text, "binned_file_name =", "'",rv$binned_file_name,"'", "\n\n\n")
+  my_text = paste0(my_text, "binned_file_name <-", "'",rv$binned_file_name,"'", "\n\n\n")
 
 
 
@@ -348,9 +348,11 @@ create_script_in_r <- function(my_decoding_params, rv) {
 
   my_text = paste0(my_text, "DECODING_RESULTS <- NDTr::run_decoding(cv)\n\n\n")
 
-  my_text = paste0(my_text, "save('DECODING_RESULTS', file = '",my_decoding_params$DC_to_be_saved_result_name, "')")
+  my_text = paste0(my_text, "save('DECODING_RESULTS', file = '", my_decoding_params$DC_to_be_saved_result_name, "')")
 
-  # my_text = paste0(my_text, "```\n\n\n")
+  my_text = paste0(my_text, "\n\n\n plot(DECODING_RESULTS$rm_main_results)")
+
+  #my_text = paste0(my_text, "```\n\n\n")
 
 
 

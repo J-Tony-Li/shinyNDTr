@@ -234,6 +234,9 @@ observe({
 
 
   observeEvent(input$DC_save_displayed_script,{
+
+    browser()
+
     req(input$DC_to_be_saved_script_name, rv$displayed_script)
     temp_file_name = file.path(script_base_dir, input$DC_to_be_saved_script_name)
     file.create(temp_file_name, overwrite = TRUE)
@@ -250,24 +253,60 @@ observe({
 
   observeEvent(input$DC_run_decoding, {
 
-    req(input$DC_to_be_saved_script_name, rv$displayed_script)
-    file.create(file.path(script_base_dir, input$DC_to_be_saved_script_name), overwrite = TRUE)
-    write(rv$displayed_script, file = file.path(script_base_dir,input$DC_to_be_saved_script_name))
+    #req(input$DC_to_be_saved_script_name, rv$displayed_script)
+    #file.create(file.path(script_base_dir, input$DC_to_be_saved_script_name), overwrite = TRUE)
+    #write(rv$displayed_script, file = file.path(script_base_dir,input$DC_to_be_saved_script_name))
+
+
+    req(input$DC_to_be_saved_result_name, rv$displayed_script)
+
+    # add the appropriate file extenstion to the saved file name
+    if(input$DC_script_mode == "R Markdown"){
+      file_extension <- ".Rmd"
+    } else {
+      file_extension <- ".R"
+    }
+
+    file_pieces <- unlist(base::strsplit(input$DC_to_be_saved_result_name, "[.]"))
+
+    if (length(file_pieces) == 1) {
+      save_file_name <- paste0(file_pieces[1], file_extension)
+    }  else {
+
+      if  (!(file_pieces[length(file_pieces)] == file_extension)){
+        save_file_name <- paste0(save_file_name, file_extension)
+      } else {
+        save_file_name <- input$DC_to_be_saved_result_name
+      }
+
+    }
+
+
+    save_script_name <- file.path(script_base_dir, save_file_name)
+    file.create(save_script_name, overwrite = TRUE)
+    write(rv$displayed_script, file = save_script_name)
+
 
     if(input$DC_script_mode == "R Markdown"){
-0
+
 
       # if(!(file.exists(input$DC_to_be_saved_script_name) && tools::file_ext(input$DC_to_be_saved_script_name) == "Rmd" || tools::file_ext(input$DC_to_be_saved_script_name) == "rmd" )){
       #   rv$script_rmd_not_saved_yet <- rv$script_rmd_not_saved_yet * (-1)
       # } else{
       # rmarkdown::render(file.path(script_base_dir,input$DC_to_be_saved_script_name))
-      create_pdf_including_result_upon_run_decoding(input$DC_to_be_saved_script_name)
+
+      #create_pdf_including_result_upon_run_decoding(save_script_name)
+
+      rmarkdown::render(save_script_name, "pdf_document")
+
 
       # }
 
     } else{
+
       # eval(parse(text = rv$displayed_script))
-      source(file.path(script_base_dir,input$DC_to_be_saved_script_name))
+
+      source(save_script_name)
 
     }
   })

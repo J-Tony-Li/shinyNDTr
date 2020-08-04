@@ -45,6 +45,10 @@ vignettes/*.pdf
 # End of https://www.gitignore.io/api/r
 
 
+# added by Ethan
+results/*.rda
+scripts/*.*
+
 
 # added by Cindy
 *.swo

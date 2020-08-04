@@ -44,6 +44,8 @@ function(input, output, session) {
   rv$result_data <- NULL
 
 
+  rv$script_rmd_not_saved_yet <- 1
+
   rv$www_base_dir <- www_base_dir
   # only files meet specified files types will be shown. However, such dir shown as empty can still be choosed
 
@@ -199,23 +201,16 @@ observe({
     }
   })
 
-  observe({
-    req(input$Plot_chosen_result)
-    temp_df_file <- shinyFiles::parseFilePaths(c(wd= rv$result_base_dir),input$Plot_chosen_result)
-    # print(temp_df_file)
-    req(temp_df_file$datapath)
-    rv$result_chosen <- temp_df_file$datapath
-    load(rv$result_chosen)
-    rv$result_data <- DECODING_RESULTS
 
-  })
+
+
 
   observeEvent(input$bin_save_raster_to_disk, {
     req(input$bin_uploaded_raster,input$bin_uploaded_raster_name )
     unzip(input$bin_uploaded_raster$datapath, exdir=input$bin_uploaded_raster_name)
-
-
   })
+
+
   observe({
     req(input$DS_uploaded_binned)
     temp_file_name <-input$DS_uploaded_binned$datapath
@@ -233,89 +228,14 @@ observe({
 
 
 
-  observeEvent(input$DC_save_displayed_script,{
-
-    browser()
-
-    req(input$DC_to_be_saved_script_name, rv$displayed_script)
-    temp_file_name = file.path(script_base_dir, input$DC_to_be_saved_script_name)
-    file.create(temp_file_name, overwrite = TRUE)
-    write(rv$displayed_script, file = temp_file_name)
-  })
-
-  rv$script_rmd_not_saved_yet <- 1
-
-  # er_DC_rmd_not_saved_before_decoding_error <- eventReactive(rv$script_rmd_not_saved_yet,{
-  #   validate("Please save the script in R Mardown first !")
-  # })
 
 
 
-  observeEvent(input$DC_run_decoding, {
-
-    #req(input$DC_to_be_saved_script_name, rv$displayed_script)
-    #file.create(file.path(script_base_dir, input$DC_to_be_saved_script_name), overwrite = TRUE)
-    #write(rv$displayed_script, file = file.path(script_base_dir,input$DC_to_be_saved_script_name))
-
-
-    req(input$DC_to_be_saved_result_name, rv$displayed_script)
-
-    # add the appropriate file extenstion to the saved file name
-    if(input$DC_script_mode == "R Markdown"){
-      file_extension <- ".Rmd"
-    } else {
-      file_extension <- ".R"
-    }
-
-    file_pieces <- unlist(base::strsplit(input$DC_to_be_saved_result_name, "[.]"))
-
-    if (length(file_pieces) == 1) {
-      save_file_name <- paste0(file_pieces[1], file_extension)
-    }  else {
-
-      if  (!(file_pieces[length(file_pieces)] == file_extension)){
-        save_file_name <- paste0(save_file_name, file_extension)
-      } else {
-        save_file_name <- input$DC_to_be_saved_result_name
-      }
-
-    }
-
-
-    save_script_name <- file.path(script_base_dir, save_file_name)
-    file.create(save_script_name, overwrite = TRUE)
-    write(rv$displayed_script, file = save_script_name)
-
-
-    if(input$DC_script_mode == "R Markdown"){
-
-
-      # if(!(file.exists(input$DC_to_be_saved_script_name) && tools::file_ext(input$DC_to_be_saved_script_name) == "Rmd" || tools::file_ext(input$DC_to_be_saved_script_name) == "rmd" )){
-      #   rv$script_rmd_not_saved_yet <- rv$script_rmd_not_saved_yet * (-1)
-      # } else{
-      # rmarkdown::render(file.path(script_base_dir,input$DC_to_be_saved_script_name))
-
-      #create_pdf_including_result_upon_run_decoding(save_script_name)
-
-      rmarkdown::render(save_script_name, "pdf_document")
-
-
-      # }
-
-    } else{
-
-      # eval(parse(text = rv$displayed_script))
-
-      source(save_script_name)
-
-    }
-  })
-
-
+### Bin the data ---------------------
 
   observeEvent(input$bin_bin_data,{
 
-print(typeof(input$bin_bin_data))
+    print(typeof(input$bin_bin_data))
 
     if(rv$raster_bRda){
 
@@ -815,6 +735,16 @@ req(rv$mRaster_cur_data)
 
 
 
+
+
+
+
+
+  ### Data Source ----------------------------------------
+
+
+
+
   output$DS_show_chosen_bin = renderText({
     if(is.na(rv$binned_file_name)){
       "No file chosen yet"
@@ -918,6 +848,7 @@ req(rv$mRaster_cur_data)
 
 
 
+  ### Feature preprocessors ----------------------------------------
 
 
   output$FP_check_fp = renderUI({
@@ -959,10 +890,11 @@ req(rv$mRaster_cur_data)
     req(rv$binned_data)
 
     if(input$DS_type == "basic_DS"){
+
       validate(
         need(!is.null(input$DS_basic_level_to_use)||input$DS_bUse_all_levels, paste0("You haven't set ",
-                                                                                     lLabels$DS_basic_level_to_use, " yet!"))
-      )
+                                                                                     lLabels$DS_basic_level_to_use, " yet!")))
+
       if(input$DS_bUse_all_levels){
         reactive_all_levels_of_basic_var_to_decode()
 
@@ -992,6 +924,10 @@ req(rv$mRaster_cur_data)
 
 
 
+
+  ### Cross-validator ----------------------------------------
+
+
   reactive_level_repetition_info <- reactive({
 
     req(reactive_DS_levels_to_use())
@@ -1011,7 +947,6 @@ req(rv$mRaster_cur_data)
 
 
   })
-
 
 
 
@@ -1057,12 +992,9 @@ req(rv$mRaster_cur_data)
 
 
 
-
-
   output$CV_split <- renderUI({
       numericInput("CV_split", lLabels$CV_split, value = 5, min = 2)
     })
-
 
 
 
@@ -1072,7 +1004,6 @@ req(rv$mRaster_cur_data)
     updateNumericInput(session, "CV_repeat", max = floor(temp_level_repetition_info$max_repetition_avail_with_any_site/input$CV_split))
     updateNumericInput(session, "CV_split", max = floor(temp_level_repetition_info$max_repetition_avail_with_any_site/input$CV_repeat))
   })
-
 
 
 
@@ -1090,6 +1021,12 @@ req(rv$mRaster_cur_data)
 
 
 
+
+
+
+### Run Decoding ----------------------------------------
+
+
   output$DC_show_chosen_script = renderText({
     basename(rv$script_chosen)
   })
@@ -1105,17 +1042,16 @@ req(rv$mRaster_cur_data)
   })
 
 
-
-
   output$DC_pdf <- renderUI({
+
     req(input$DC_to_be_saved_script_name)
     tags$iframe(style="height:600px; width:100%", src= paste0(substr(basename(input$DC_to_be_saved_script_name), 1,nchar(basename(input$DC_to_be_saved_script_name))-3), "pdf"))
   })
 
 
 
-
   observeEvent(input$Plot_create_pdf,{
+
     req(rv$result_chosen, input$Plot_timeseries_result_type)
     append_result_to_pdf_and_knit(rv$result_chosen, input$Plot_timeseries_result_type)
     print("done")
@@ -1128,54 +1064,163 @@ req(rv$mRaster_cur_data)
 
   })
 
+
+
+
+  observeEvent(input$DC_save_displayed_script,{
+
+    browser()
+
+    req(input$DC_to_be_saved_script_name, rv$displayed_script)
+    temp_file_name = file.path(script_base_dir, input$DC_to_be_saved_script_name)
+    file.create(temp_file_name, overwrite = TRUE)
+    write(rv$displayed_script, file = temp_file_name)
+  })
+
+
+  # er_DC_rmd_not_saved_before_decoding_error <- eventReactive(rv$script_rmd_not_saved_yet,{
+  #   validate("Please save the script in R Mardown first !")
+  # })
+
+
+
+  observeEvent(input$DC_run_decoding, {
+
+    #req(input$DC_to_be_saved_script_name, rv$displayed_script)
+    #file.create(file.path(script_base_dir, input$DC_to_be_saved_script_name), overwrite = TRUE)
+    #write(rv$displayed_script, file = file.path(script_base_dir,input$DC_to_be_saved_script_name))
+
+
+    req(input$DC_to_be_saved_result_name, rv$displayed_script)
+
+    # add the appropriate file extenstion to the saved file name
+    if(input$DC_script_mode == "R Markdown"){
+      file_extension <- ".Rmd"
+    } else {
+      file_extension <- ".R"
+    }
+
+    file_pieces <- unlist(base::strsplit(input$DC_to_be_saved_result_name, "[.]"))
+
+    if (length(file_pieces) == 1) {
+      save_file_name <- paste0(file_pieces[1], file_extension)
+    }  else {
+
+      if  (!(file_pieces[length(file_pieces)] == file_extension)){
+        save_file_name <- paste0(save_file_name, file_extension)
+      } else {
+        save_file_name <- input$DC_to_be_saved_result_name
+      }
+
+    }
+
+
+    save_script_name <- file.path(script_base_dir, save_file_name)
+    #file.create(save_script_name, overwrite = TRUE)  # delete, this just saved a file called TRUE
+    write(rv$displayed_script, file = save_script_name)
+
+    rv$save_script_name <- save_script_name
+
+    # run the script/Markdown document to get the results
+
+    if(input$DC_script_mode == "R Markdown") {
+
+
+      # if(!(file.exists(input$DC_to_be_saved_script_name) && tools::file_ext(input$DC_to_be_saved_script_name) == "Rmd" || tools::file_ext(input$DC_to_be_saved_script_name) == "rmd" )){
+      #   rv$script_rmd_not_saved_yet <- rv$script_rmd_not_saved_yet * (-1)
+      # } else{
+      # rmarkdown::render(file.path(script_base_dir,input$DC_to_be_saved_script_name))
+
+      #create_pdf_including_result_upon_run_decoding(save_script_name)
+
+      rmarkdown::render(save_script_name, "pdf_document")
+
+
+      # }
+
+    } else{
+
+      # eval(parse(text = rv$displayed_script))
+
+      source(save_script_name)
+
+    }
+  })
+
+
+
+
+
+
+
+
+### Plotting results ----------------------------------------
+
+
+  observe({
+    req(input$Plot_chosen_result)
+    temp_df_file <- shinyFiles::parseFilePaths(c(wd= rv$result_base_dir),input$Plot_chosen_result)
+    # print(temp_df_file)
+    req(temp_df_file$datapath)
+    rv$result_chosen <- temp_df_file$datapath
+    load(rv$result_chosen)
+    rv$result_data <- DECODING_RESULTS
+  })
+
+
   output$Plot_show_chosen_result = renderText({
+
     # temp_text = "Chose result"
     # rv$result_cur_dir_name <- parseDirPath(c(wd=eval(getwd())),input$Plot_chosen_result)
     if(is.na(rv$result_chosen)){
       "No file chosen yet"
     } else{
       basename(rv$result_chosen)
-
     }
   })
 
 
+
   output$Plot_timeseries = renderPlot({
+
     req(rv$result_data)
     # print(input$Plot_timeseries_result_type)
     length(rv$result_data)
     typeof(rv$result_data)
 
-    temp_result <- rv$result_data[[input$Plot_timeseries_result_type]]
-
-    # get the mean over CV splits
-
-    temp_mean_results <- colMeans(temp_result)
-
-    temp_time_bin_names <- NDTr::get_center_bin_time(dimnames(temp_result)[[3]])
-
-    # plot(temp_time_bin_names, diag(temp_mean_results), type = "o", xlab = "Time (ms)", ylab = "Classification Accuracy")
-    # abline(v = 0)
-
-    temp_result_df <- data.frame(time = temp_time_bin_names, results = diag(temp_mean_results))
+    plot(rv$result_data$rm_main_results, plot_type = "line",
+         result_type = input$Plot_timeseries_result_type)
 
 
-    if (input$Plot_timeseries_result_type == "zero_one_loss_results") {
-      ylabel <- "Classification accuracy"
-    } else if (input$Plot_timeseries_result_type == "rank_results") {
-      ylabel <- "Normalized rank"
-    } else if (input$Plot_timeseries_result_type == "decision_value_results") {
-      ylabel <- "Decision values"
-    }
-
-
-    temp_result_df %>%
-      ggplot(aes(x = time, y = results)) +
-      geom_line() +
-      xlab("Time (ms)") +
-      ylab(ylabel) +
-      theme_bw()
-
+    # temp_result <- rv$result_data[[input$Plot_timeseries_result_type]]
+    #
+    # # get the mean over CV splits
+    #
+    # temp_mean_results <- colMeans(temp_result)
+    #
+    # temp_time_bin_names <- NDTr::get_center_bin_time(dimnames(temp_result)[[3]])
+    #
+    # # plot(temp_time_bin_names, diag(temp_mean_results), type = "o", xlab = "Time (ms)", ylab = "Classification Accuracy")
+    # # abline(v = 0)
+    #
+    # temp_result_df <- data.frame(time = temp_time_bin_names, results = diag(temp_mean_results))
+    #
+    #
+    # if (input$Plot_timeseries_result_type == "zero_one_loss_results") {
+    #   ylabel <- "Classification accuracy"
+    # } else if (input$Plot_timeseries_result_type == "rank_results") {
+    #   ylabel <- "Normalized rank"
+    # } else if (input$Plot_timeseries_result_type == "decision_value_results") {
+    #   ylabel <- "Decision values"
+    # }
+    #
+    #
+    # temp_result_df %>%
+    #   ggplot(aes(x = time, y = results)) +
+    #   geom_line() +
+    #   xlab("Time (ms)") +
+    #   ylab(ylabel) +
+    #   theme_bw()
 
 
   })
@@ -1183,22 +1228,28 @@ req(rv$mRaster_cur_data)
 
 
   output$Plot_tct = renderPlot({
+
     req(rv$result_data)
-    temp_result <- rv$result_data[[input$Plot_tct_result_type]]
 
-    # get the mean over CV splits
 
-    temp_mean_results <- colMeans(temp_result)
+    plot(rv$result_data$rm_main_results,
+         result_type = input$Plot_timeseries_result_type)
 
-    temp_time_bin_names <- NDTr::get_center_bin_time(dimnames(temp_result)[[3]])
-
-    image.plot(temp_time_bin_names, temp_time_bin_names, temp_mean_results,
-
-               legend.lab = "Classification Accuracy", xlab = "Test time (ms)",
-
-               ylab = "Train time (ms)")
-
-    abline(v = 0)
+    # temp_result <- rv$result_data[[input$Plot_tct_result_type]]
+    #
+    # # get the mean over CV splits
+    #
+    # temp_mean_results <- colMeans(temp_result)
+    #
+    # temp_time_bin_names <- NDTr::get_center_bin_time(dimnames(temp_result)[[3]])
+    #
+    # image.plot(temp_time_bin_names, temp_time_bin_names, temp_mean_results,
+    #
+    #            legend.lab = "Classification Accuracy", xlab = "Test time (ms)",
+    #
+    #            ylab = "Train time (ms)")
+    #
+    # abline(v = 0)
 
   })
 

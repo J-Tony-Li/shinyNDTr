@@ -45,7 +45,7 @@ all_fp <- c("fp_select_k_features", "fp_zscore")
 
 
 
-all_result_type <- c("zero_one_loss_results", "rank_results", "decision_value_results")
+all_result_type <- c("zero_one_loss", "normalized_rank", "decision_values", "all")
 
 df_cl_fp <- data.frame(c(1, 1), c(1, 1), c(1, 0))
 
@@ -348,9 +348,16 @@ create_script_in_r <- function(my_decoding_params, rv) {
 
   my_text = paste0(my_text, "DECODING_RESULTS <- NDTr::run_decoding(cv)\n\n\n")
 
-  my_text = paste0(my_text, "save('DECODING_RESULTS', file = '", my_decoding_params$DC_to_be_saved_result_name, "')")
+  # my_text = paste0(my_text, "save('DECODING_RESULTS', file = '", my_decoding_params$DC_to_be_saved_result_name, "')")
 
-  my_text = paste0(my_text, "\n\n\n plot(DECODING_RESULTS$rm_main_results)")
+
+  my_text = paste0(my_text, "'Decodings results analysis ID:'\n")
+  my_text = paste0(my_text, "DECODING_RESULTS$cross_validation_paramaters$analysis_ID \n\n\n")
+
+  analysis_name <- "my_analysis"
+  my_text = paste0(my_text, "NDTr::log_save_results(DECODING_RESULTS, '", rv$result_base_dir, "')")
+
+  my_text = paste0(my_text, "\n\n\nplot(DECODING_RESULTS$rm_main_results)")
 
   #my_text = paste0(my_text, "```\n\n\n")
 

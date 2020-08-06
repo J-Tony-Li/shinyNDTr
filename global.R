@@ -32,6 +32,8 @@ script_base_dir <- file.path(eval(getwd()),'scripts') #"."
 result_base_dir <- file.path(eval(getwd()),'results') #"."
 www_base_dir <- file.path(eval(getwd()),'www') #"."
 
+
+
 # all_cl <- c("maximum correlation", "support vecotor machine", "poisson naive bayes")
 # all_fp <- c("select_pvalue_significant_features","select or exclude top k features", "zscore_normalize")
 

@@ -1044,20 +1044,35 @@ req(rv$mRaster_cur_data)
 
   output$DC_pdf <- renderUI({
 
-    req(input$DC_to_be_saved_script_name)
-    tags$iframe(style="height:600px; width:100%", src= paste0(substr(basename(input$DC_to_be_saved_script_name), 1,nchar(basename(input$DC_to_be_saved_script_name))-3), "pdf"))
+    #browser()
+    #req(input$DC_to_be_saved_script_name)
+    req(rv$save_script_name)
+
+    pdf_name <- gsub("Rmd", "pdf", rv$save_script_name)
+
+    tags$iframe(style="height:600px; width:100%", src = pdf_name)
+    #paste('<iframe style="height:600px; width:100%" src="', pdf_name, '"></iframe>', sep = "")
+
+
   })
 
 
 
   observeEvent(input$Plot_create_pdf,{
 
+    browser()
+
     req(rv$result_chosen, input$Plot_timeseries_result_type)
     append_result_to_pdf_and_knit(rv$result_chosen, input$Plot_timeseries_result_type)
     print("done")
     output$Plot_pdf <- renderUI({
+
       req(rv$result_chosen)
-      tags$iframe(style="height:600px; width:100%", src= paste0(substr(basename(rv$result_chosen), 1,nchar(basename(rv$result_chosen))-3), "pdf"))
+
+      pdf_name <- gsub("Rmd", "pdf", rv$save_script_name)
+      tags$iframe(style="height:600px; width:100%", src = pdf_name)
+
+      #tags$iframe(style="height:600px; width:100%", src= paste0(substr(basename(rv$result_chosen), 1,nchar(basename(rv$result_chosen))-3), "pdf"))
       # return(paste('<iframe style="height:600px; width:100%" src="', file.path(script_base_dir, paste0(substr(basename(rv$result_chosen), 1,nchar(basename(rv$result_chosen))-3), "pdf")), '"></iframe>', sep = ""))
       # return(paste('<iframe style="height:600px; width:100%" src="', "https://asterius.hampshire.edu/s/afd81b2933ea5d1a296e3/files/GitHub/shinyNDTr/scripts/rmd.pdf", '"></iframe>', sep = ""))
     })
@@ -1130,13 +1145,10 @@ req(rv$mRaster_cur_data)
       #   rv$script_rmd_not_saved_yet <- rv$script_rmd_not_saved_yet * (-1)
       # } else{
       # rmarkdown::render(file.path(script_base_dir,input$DC_to_be_saved_script_name))
-
       #create_pdf_including_result_upon_run_decoding(save_script_name)
 
       rmarkdown::render(save_script_name, "pdf_document")
 
-
-      # }
 
     } else{
 

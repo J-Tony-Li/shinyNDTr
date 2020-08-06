@@ -5,9 +5,9 @@ account: emmCS
 server: asterius.hampshire.edu
 hostUrl: https://asterius.hampshire.edu:3939/__api__
 appId: 13
-bundleId: 33
+bundleId: 36
 url: https://asterius.hampshire.edu:3939/research/shinyNDTr/
-when: 1596510241.94124
+when: 1596574245.74052
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .Rbuildignore|.RData|DESCRIPTION|NAMESPACE|README.md|TRUE|scripts/testing.Rmd|shiny_bookmarks/45e9f34f9a54828f/0.pdf|shiny_bookmarks/45e9f34f9a54828f/input.rds|shiny_bookmarks/47f8f8de31404ccd/input.rds
+ignoredFiles: .Rbuildignore|.RData|DESCRIPTION|input.Rda|NAMESPACE|README.md|TRUE|results/20200804_164853_60738.rda|results/results_manifest.rda|scripts/abc.Rmd|scripts/basic_result.pdf|scripts/basic_result.Rmd|scripts/basic_result.tex|shiny_bookmarks/45e9f34f9a54828f/0.pdf|shiny_bookmarks/45e9f34f9a54828f/input.rds|shiny_bookmarks/47f8f8de31404ccd/input.rds

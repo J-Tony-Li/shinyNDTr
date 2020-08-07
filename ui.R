@@ -125,7 +125,7 @@ ui <- dashboardPage(
 
 
                          tabPanel(
-                           title = "Specify decoding papameters",
+                           title = "Run a decoding analysis",
                            fluidPage(
 
 
@@ -260,6 +260,8 @@ ui <- dashboardPage(
                                                title = "Run analysis",
                                                width = NULL,
                                                fluidRow(
+
+
                                                  column(
                                                    width = 6,
                                                    box(
@@ -278,45 +280,44 @@ ui <- dashboardPage(
                                                      uiOutput("DC_offer_run_decoding")
 
                                                      # )
-                                                   ),
+                                                   ) #),
+
+
                                                    # tabPanel(
                                                    # title = "",
                                                    # width = NULL,
 
-                                                   box(
-                                                     title = "Load an existing script",
-                                                     width = NULL,
-                                                     status = "success",
-                                                     # background = "aqua",
-                                                     solidHeader = TRUE,
-                                                     # script will show upon chosen
-                                                     shinyFiles::shinyFilesButton("DC_chosenscript_name", lLabels$DC_chosenscript_name, "", multiple = FALSE),
-                                                     helpText("Displayed script: "),
+                                                   # box(
+                                                   #   title = "Load an existing script",
+                                                   #   width = NULL,
+                                                   #   status = "success",
+                                                   #   # background = "aqua",
+                                                   #   solidHeader = TRUE,
+                                                   #   # script will show upon chosen
+                                                   #   shinyFiles::shinyFilesButton("DC_chosenscript_name", lLabels$DC_chosenscript_name, "", multiple = FALSE),
+                                                   #   helpText("Displayed script: "),
+                                                   #
+                                                   #   textOutput("DC_show_chosen_script")
+                                                   # )
 
-                                                     textOutput("DC_show_chosen_script")
-                                                   )
                                                  ),
+
+
                                                  column(width = 6,
                                                         box(width = NULL,
-
                                                             uiOutput("DC_ace")
-
-
                                                         )
-
-
                                                  )
+
+
                                                )
                                              ),
+
                                              tabPanel("PDF",
                                                #width = NULL,
 
-                                               #helpText("Will pop up when done"),
+                                               #helpText("The results will appear below once the code is done running"),
                                                uiOutput("DC_pdf")
-                                               #tags$iframe(style="height:600px; width:100%", src="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf")
-
-
-
                                              )
 
 

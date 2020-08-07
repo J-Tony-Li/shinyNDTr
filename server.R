@@ -1054,18 +1054,34 @@ req(rv$mRaster_cur_data)
   #output$DC_pdf <- renderUI({
   output$DC_pdf <- renderUI({
 
+    if (is.null(rv$save_script_name)) {
 
-    req(rv$save_script_name)
+      "The results will appear as a pdf below once the code is done running."
 
-    pdf_name <- gsub("Rmd", "pdf", basename(rv$save_script_name))
+    } else {
 
-    #tags$iframe(style="height:600px; width:100%", src = pdf_name)
-    #paste('<iframe style="height:600px; width:100%" src="', pdf_name, '"></iframe>', sep = "")
+      # note, a files in the www/ directory is referenced without needing to
+      # specify a prefix directly (just list the file name)
+      pdf_name <- gsub("Rmd", "pdf", basename(rv$save_script_name))
+      tags$iframe(style="height:600px; width:100%", src = pdf_name)
 
-    #pdf_name<- "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf"
+    }
 
-    #paste0('<html>', tags$iframe(style="height:600px; width:100%", src = a_pdf), "</html>")
-    tags$iframe(style="height:600px; width:100%", src = pdf_name)
+
+    # browser()
+    # pdf_name <- gsub("Rmd", "pdf", basename(rv$save_script_name))
+    #
+    #   #tags$iframe(style="height:600px; width:100%", src = pdf_name)
+    #   #paste('<iframe style="height:600px; width:100%" src="', pdf_name, '"></iframe>', sep = "")
+    #
+    #   #pdf_name<- "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf"
+    #
+    #   #paste0('<html>', tags$iframe(style="height:600px; width:100%", src = a_pdf), "</html>")
+    #   tags$iframe(style="height:600px; width:100%", src = pdf_name)
+    #
+
+
+
 
   })
 

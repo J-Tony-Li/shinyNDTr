@@ -246,6 +246,7 @@ observe({
       temp_call = paste0("NDTr::create_binned_data(rv$raster_cur_dir_name, ",
                          "paste0(binned_basename, input$bin_prefix_of_binned_file_name),",
                          "input$bin_bin_width, input$bin_step_size")
+
       if(!is.na(input$bin_start_ind)){
         temp_call = paste0(temp_call, ",input$bin_start_ind")
       }
@@ -253,7 +254,15 @@ observe({
         temp_call = paste0(temp_call, ",input$bin_end_ind")
       }
       temp_call = paste0(temp_call,")")
-      rv$create_bin_function_run <- temp_call
+      #rv$create_bin_function_run <- temp_call
+
+      print(binned_basename)
+      rv$create_bin_function_run <- paste0("NDTr::create_binned_data('",
+                                           rv$raster_cur_dir_name, "', ",
+                                           "'", binned_basename,
+                                           input$bin_prefix_of_binned_file_name, "', ",
+                                           input$bin_bin_width, ", ", input$bin_step_size, ")")
+
       eval(parse(text = temp_call))
 
     } else if(rv$raster_bMat){
@@ -1042,17 +1051,21 @@ req(rv$mRaster_cur_data)
   })
 
 
+  #output$DC_pdf <- renderUI({
   output$DC_pdf <- renderUI({
 
-    #browser()
-    #req(input$DC_to_be_saved_script_name)
+
     req(rv$save_script_name)
 
-    pdf_name <- gsub("Rmd", "pdf", rv$save_script_name)
+    pdf_name <- gsub("Rmd", "pdf", basename(rv$save_script_name))
 
-    tags$iframe(style="height:600px; width:100%", src = pdf_name)
+    #tags$iframe(style="height:600px; width:100%", src = pdf_name)
     #paste('<iframe style="height:600px; width:100%" src="', pdf_name, '"></iframe>', sep = "")
 
+    #pdf_name<- "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf"
+
+    #paste0('<html>', tags$iframe(style="height:600px; width:100%", src = a_pdf), "</html>")
+    tags$iframe(style="height:600px; width:100%", src = pdf_name)
 
   })
 
@@ -1147,7 +1160,8 @@ req(rv$mRaster_cur_data)
       # rmarkdown::render(file.path(script_base_dir,input$DC_to_be_saved_script_name))
       #create_pdf_including_result_upon_run_decoding(save_script_name)
 
-      rmarkdown::render(save_script_name, "pdf_document")
+      #save_file_name to www directory
+      rmarkdown::render(save_script_name, "pdf_document", output_dir = "www")
 
 
     } else{

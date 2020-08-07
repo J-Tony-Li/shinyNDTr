@@ -308,13 +308,12 @@ ui <- dashboardPage(
                                                  )
                                                )
                                              ),
-                                             tabPanel(
-                                               title = "PDF",
-                                               width = NULL,
+                                             tabPanel("PDF",
+                                               #width = NULL,
 
-                                               helpText("Will pop up when done"),
+                                               #helpText("Will pop up when done"),
                                                uiOutput("DC_pdf")
-
+                                               #tags$iframe(style="height:600px; width:100%", src="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf")
 
 
 

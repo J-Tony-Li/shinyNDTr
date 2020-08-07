@@ -28,10 +28,11 @@ options(shiny.maxRequestSize=1000*1024^2)
 state_base_dir <- file.path(eval(getwd()))
 raster_base_dir <- file.path(eval(getwd()),'data/raster') #"."
 binned_base_dir <- file.path(eval(getwd()),'data/binned') #"."
-script_base_dir <- file.path(eval(getwd()),'scripts') #"."
+#script_base_dir <- file.path(eval(getwd()),'scripts') #"."
 result_base_dir <- file.path(eval(getwd()),'results') #"."
 www_base_dir <- file.path(eval(getwd()),'www') #"."
 
+script_base_dir <- file.path('scripts') #"."
 
 
 # all_cl <- c("maximum correlation", "support vecotor machine", "poisson naive bayes")
